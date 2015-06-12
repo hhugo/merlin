@@ -132,11 +132,6 @@ module Protocol_io = struct
       end
     | _ -> failwith "Incorrect position"
 
-  let with_location loc assoc =
-    `Assoc (("start", Lexing.json_of_position loc.Location.loc_start) ::
-            ("end",   Lexing.json_of_position loc.Location.loc_end) ::
-            assoc)
-
   let optional_position = function
     | [`String "at"; jpos] -> Some (pos_of_json jpos)
     | [] -> None
@@ -158,7 +153,7 @@ module Protocol_io = struct
     `List (List.map (fun s -> `String s) l)
 
   let json_of_type_loc (loc,str,tail) =
-    with_location loc [
+    Lexing.with_location loc [
       "type", `String str;
       "tail", `String (match tail with
           | `No -> "no"
@@ -198,7 +193,7 @@ module Protocol_io = struct
 
   let rec json_of_outline outline =
     let json_of_item { outline_name ; outline_kind ; location ; children } =
-      with_location location [
+      Lexing.with_location location [
         "name", `String outline_name;
         "kind", `String (string_of_kind outline_kind);
         "children", `List (json_of_outline children);
@@ -430,7 +425,7 @@ module Protocol_io = struct
         | Type_enclosing _, results ->
           `List (List.map json_of_type_loc results)
         | Enclosing _, results ->
-          `List (List.map (fun loc -> with_location loc []) results)
+          `List (List.map (fun loc -> Lexing.with_location loc []) results)
         | Complete_prefix _, compl ->
           json_of_completions compl
         | Expand_prefix _, compl ->
@@ -508,7 +503,7 @@ module Protocol_io = struct
           `Assoc (with_failures ["result", json_of_string_list strs] failures)
         | Occurrences _, locations ->
           `List (List.map locations
-                   ~f:(fun loc -> with_location loc []))
+                   ~f:(fun loc -> Lexing.with_location loc []))
         | Idle_job, b -> `Bool b
         | Version, version ->
           `String version
@@ -518,9 +513,6 @@ module Protocol_io = struct
     | `List jsons -> request_of_json jsons
     | _ -> invalid_arguments ()
 end
-
-(* Used when dumping state as raw json *)
-let with_location = Protocol_io.with_location
 
 let lift (i,o : low_io) : io =
   (Stream.map ~f:Protocol_io.request_of_json i,

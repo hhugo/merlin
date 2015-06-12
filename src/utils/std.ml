@@ -30,6 +30,8 @@ module Json = struct
   include Yojson.Basic
   let string x = `String x
   let int x = `Int x
+
+
 end
 type json = Json.json
 
@@ -563,6 +565,11 @@ module Lexing = struct
   let json_of_position pos =
     let line, col = split_pos pos in
     `Assoc ["line", `Int line; "col", `Int col]
+
+  let with_location loc assoc =
+    `Assoc (("start", json_of_position loc.Location.loc_start) ::
+            ("end",   json_of_position loc.Location.loc_end) ::
+            assoc)
 end
 
 module Stream = struct

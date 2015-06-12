@@ -150,6 +150,7 @@ if ocamlfind ocamlopt; then
 else
   NATIVE=false
 fi
+NATIVE=false
 
 cat <<END
 

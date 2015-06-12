@@ -176,8 +176,6 @@ SOURCES = \
 	src/ocaml_aux/error_report.mli    \
 	src/ocaml_aux/error_report.ml     \
 	src/frontend/protocol.mli         \
-	src/frontend/IO.mli               \
-	src/frontend/IO.ml                \
 	src/analysis/browse.mli           \
 	src/analysis/browse.ml            \
 	src/analysis/browse_misc.ml       \
@@ -196,17 +194,18 @@ SOURCES = \
 	$(TYPER)/tast_helper.ml           \
 	src/analysis/destruct.mli         \
 	src/analysis/destruct.ml          \
-	src/frontend/IO_sexp.ml           \
 	src/frontend/command.mli          \
-	src/frontend/command.ml           \
-	src/frontend/ocamlmerlin.ml
+	src/frontend/command.ml
+
+SOURCES += src/frontend/ocamlmerlin_js.ml
+
+# SOURCES += src/frontend/IO.mli            \
+# 	src/frontend/IO.ml                \
+# 	src/frontend/IO_sexp.ml           \
+# 	src/frontend/ocamlmerlin.ml
 
 PACKS = str findlib yojson unix
 
-ifeq "$(NATIVE)" "false"
 ocamlmerlin $(RESULT): byte-code
-else
-ocamlmerlin $(RESULT): native-code
-endif
 
 -include OCamlMakefile
